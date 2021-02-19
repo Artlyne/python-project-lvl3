@@ -1,2 +1,0 @@
-def download():
-    return 'Yo'

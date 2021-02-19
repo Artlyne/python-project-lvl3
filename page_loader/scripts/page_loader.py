@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-from page_loader import app
+from page_loader import page_loader
 
 
 def main():
-    print(app.download())
+    args = page_loader.parser().parse_args()
+    result = page_loader.download(args.url, args.output)
+    print(result)
 
 
 if __name__ == '__main__':
