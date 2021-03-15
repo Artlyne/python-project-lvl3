@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hexlet_code"
-version = "0.1.0"
+version = "0.2.0"
 description = "the command line utility, which downloads a page from the network and puts it in the specified existing directory"
 authors = ["Andrey Martsenius <artlynee@gmail.com>"]
 
@@ -14,6 +14,7 @@ page-loader = "page_loader.scripts.page_loader:main"
 [tool.poetry.dependencies]
 python = "^3.8"
 requests = "^2.25.1"
+beautifulsoup4 = "^4.9.3"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.4"
