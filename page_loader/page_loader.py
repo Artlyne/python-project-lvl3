@@ -66,6 +66,11 @@ def download(url: str, path: str) -> str:
     path_to_page = os.path.join(path, make_name(url))
     path_to_files = path_to_page.rstrip('.html') + '_files'
     os.makedirs(path_to_files, exist_ok=True)
+    if os.path.exists(path_to_page):
+        answer = input('File already exists and will be overwritten. '
+                       'Continue? Y/N ').lower()
+        if answer == 'n':
+            exit()
     page = replace_resources(url, response.text, path_to_files)
     with open(path_to_page, 'w', encoding='utf-8') as file:
         file.write(page)
