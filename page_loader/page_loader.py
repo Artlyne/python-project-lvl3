@@ -5,6 +5,7 @@ import os
 import argparse
 from bs4 import BeautifulSoup
 import logging
+import sys
 
 
 def make_name(url: str) -> str:
@@ -31,7 +32,7 @@ def download_resource(url: str, path: str) -> str:
         response = requests.get(url)
     except requests.exceptions.ConnectionError:
         logging.error(f"Connection Error. Can't connect to: {url}")
-        exit()
+        sys.exit()
     path_to_file = os.path.join(path, make_name(url))
     with open(path_to_file, 'wb') as file:
         file.write(response.content)
@@ -54,25 +55,30 @@ def replace_resources(url: str, page: str, path: str):
 
 def download(url: str, path: str) -> str:
     # TODO добавить проверку корректности введеных данных
-    logging.basicConfig(filename='app.log', filemode='w',
+    logging.basicConfig(filename='app.log', filemode='w', level=logging.INFO,
                         format='%(asctime)s - %(name)s - %(levelname)s - '
-                               '%(message)s - $(funcName)'
+                               '%(message)s - %(filename)s - '
+                               'function %(funcName)20s()'
                         )
     try:
         response = requests.get(url)
     except requests.exceptions.ConnectionError:
         logging.error(f"Connection Error. Can't connect to: {url}")
-        exit()
+        sys.exit()
+    logging.info('making file name')
     path_to_page = os.path.join(path, make_name(url))
     path_to_files = path_to_page.rstrip('.html') + '_files'
+    logging.info(f'Creating directory {path_to_files}')
     os.makedirs(path_to_files, exist_ok=True)
     if os.path.exists(path_to_page):
         answer = input('File already exists and will be overwritten. '
                        'Continue? Y/N ').lower()
         if answer == 'n':
-            exit()
+            sys.exit()
+    logging.info('changing links to local resources')
     page = replace_resources(url, response.text, path_to_files)
     with open(path_to_page, 'w', encoding='utf-8') as file:
+        logging.info('writing to file')
         file.write(page)
     return path_to_page
 
