@@ -6,13 +6,13 @@ import argparse
 from bs4 import BeautifulSoup
 import logging
 import sys
+from progress.bar import Bar
 
 
 def make_name(url: str) -> str:
-    # TODO заменять строку типа '_-_' на '-'
     parsed_url = urlparse(url)
     root, ext = os.path.splitext(parsed_url.path)
-    name = re.sub(r'[./_]', '-', parsed_url.netloc + root)
+    name = re.sub(r'_-_|[./_]', '-', parsed_url.netloc + root)
     if not ext:
         ext += '.html'
     max_name_length = 100
@@ -44,12 +44,15 @@ tags = {'img': 'src', 'script': 'src', 'link': 'href'}
 
 def replace_resources(url: str, page: str, path: str):
     soup = BeautifulSoup(page, 'html.parser')
+    bar = Bar('Loading ', max=len(soup.findAll(tags)), suffix='%(percent)d%%')
     for resource in soup.findAll(tags):
         tag = resource.name
         link = urljoin(url, resource.get(tags[tag]))
         if is_valid(url, link):
             path_to_file = download_resource(link, path)
             resource[tags[tag]] = path_to_file
+            bar.next()
+        bar.finish()
     return soup.prettify(formatter='html5')
 
 
@@ -70,11 +73,11 @@ def download(url: str, path: str) -> str:
     path_to_files = path_to_page.rstrip('.html') + '_files'
     logging.info(f'Creating directory {path_to_files}')
     os.makedirs(path_to_files, exist_ok=True)
-    if os.path.exists(path_to_page):
-        answer = input('File already exists and will be overwritten. '
-                       'Continue? Y/N ').lower()
-        if answer == 'n':
-            sys.exit()
+    # if os.path.exists(path_to_page):
+    #     answer = input('File already exists and will be overwritten. '
+    #                    'Continue? Y/N ').lower()
+    #     if answer == 'n':
+    #         sys.exit()
     logging.info('changing links to local resources')
     page = replace_resources(url, response.text, path_to_files)
     with open(path_to_page, 'w', encoding='utf-8') as file:

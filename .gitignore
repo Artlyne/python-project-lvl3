@@ -2,4 +2,5 @@
 dist
 **/__pycache__
 coverage.xml
+.coverage
 app.log
