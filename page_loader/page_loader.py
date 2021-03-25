@@ -1,12 +1,15 @@
-import requests
-from urllib.parse import urlparse, urljoin
-import re
-import os
 import argparse
-from bs4 import BeautifulSoup
-import logging
+import os
+import re
 import sys
+import logging
+import requests
+from bs4 import BeautifulSoup
 from progress.bar import Bar
+from urllib.parse import urlparse, urljoin
+
+
+TAGS = {'img': 'src', 'script': 'src', 'link': 'href'}
 
 
 def make_name(url: str) -> str:
@@ -39,18 +42,15 @@ def download_resource(url: str, path: str) -> str:
     return path_to_file
 
 
-tags = {'img': 'src', 'script': 'src', 'link': 'href'}
-
-
 def replace_resources(url: str, page: str, path: str):
     soup = BeautifulSoup(page, 'html.parser')
-    bar = Bar('Loading ', max=len(soup.findAll(tags)), suffix='%(percent)d%%')
-    for resource in soup.findAll(tags):
-        tag = resource.name
-        link = urljoin(url, resource.get(tags[tag]))
+    bar = Bar('Loading ', max=len(soup.findAll(TAGS)), suffix='%(percent)d%%')
+    for resource in soup.findAll(TAGS):
+        resource_source = TAGS[resource.name]
+        link = urljoin(url, resource.get(resource_source))
         if is_valid(url, link):
             path_to_file = download_resource(link, path)
-            resource[tags[tag]] = path_to_file
+            resource[resource_source] = path_to_file
             bar.next()
         bar.finish()
     return soup.prettify(formatter='html5')
@@ -73,11 +73,6 @@ def download(url: str, path: str) -> str:
     path_to_files = path_to_page.rstrip('.html') + '_files'
     logging.info(f'Creating directory {path_to_files}')
     os.makedirs(path_to_files, exist_ok=True)
-    # if os.path.exists(path_to_page):
-    #     answer = input('File already exists and will be overwritten. '
-    #                    'Continue? Y/N ').lower()
-    #     if answer == 'n':
-    #         sys.exit()
     logging.info('changing links to local resources')
     page = replace_resources(url, response.text, path_to_files)
     with open(path_to_page, 'w', encoding='utf-8') as file:
