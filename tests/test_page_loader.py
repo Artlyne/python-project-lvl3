@@ -12,12 +12,24 @@ test_names_cases = [
     (f'{URL}/python.png', 'page-loader-hexlet-repl-co-python.png'),
     (f'{URL}/python.jpg', 'page-loader-hexlet-repl-co-python.jpg'),
     (f'{URL}/python_-_1.jpg', 'page-loader-hexlet-repl-co-python-1.jpg'),
-    ]
+]
+
+
+test_valid_cases = [
+    (URL, 'https://page-loader.hexlet.repl.co/courses', True),
+    (URL, 'https://hexlet.repl.co/courses', False),
+    (URL, None, False),
+]
 
 
 @pytest.mark.parametrize('tested_name, expected_name', test_names_cases)
 def test_make_name(tested_name: str, expected_name: str):
     assert page_loader.make_name(tested_name) == expected_name
+
+
+@pytest.mark.parametrize('url, link, expected_result', test_valid_cases)
+def test_is_valid(url, link, expected_result):
+    assert page_loader.is_valid(url, link) == expected_result
 
 
 # def test_download():
