@@ -34,7 +34,7 @@ def test_is_valid(url: str, link: str, expected_result: bool):
     assert is_valid(url, link) == expected_result
 
 
-def test_download_recourse():
+def test_download_resource():
     with open('./tests/fixtures/expected_image.png', 'rb') as expected_img:
         with tempfile.TemporaryDirectory() as tmpdirname:
             path_to_test_img = download_resource(IMG, tmpdirname)
