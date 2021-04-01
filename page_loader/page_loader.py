@@ -44,15 +44,13 @@ def download_resource(url: str, path: str) -> str:
 
 def replace_resources(url: str, page: str, path: str):
     soup = BeautifulSoup(page, 'html.parser')
-    bar = Bar('Loading ', max=len(soup.findAll(TAGS)), suffix='%(percent)d%%')
     for resource in soup.findAll(TAGS):
         resource_source = TAGS[resource.name]
         link = urljoin(url, resource.get(resource_source))
         if is_valid(url, link):
+            Bar(f'Loading {link}\n')
             path_to_file = download_resource(link, path)
             resource[resource_source] = path_to_file
-            bar.next()
-        bar.finish()
     return soup.prettify(formatter='html5')
 
 
