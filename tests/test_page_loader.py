@@ -1,6 +1,8 @@
 import pytest
+import re
 import tempfile
 from page_loader.page_loader import make_name, is_valid, download_resource
+from page_loader.page_loader import download
 
 
 URL = 'https://page-loader.hexlet.repl.co'
@@ -43,19 +45,10 @@ def test_download_resource():
                        bytearray(expected_img.read())
 
 
-# качаем https://page-loader.hexlet.repl.co/assets/professions/nodejs.png
-# сверяем с предварительно скачаной
-# def test_download():
-#     """
-#     я не понимаю как можно протестировать загрузку страницы, ведь актуальная
-#     версия страницы может отличаться от ранее сохраненной, и это нормально
-#     """
-#     with open( os.getcwd() + '/tests/fixtures/expected_page.html', 'r') as f:
-#         expected_page = f.read()
-#
-#     path_to_test_page = page_loader.download(URL, os.getcwd() + '/tests/fixtures')
-#
-#     with open(path_to_test_page, 'r') as f:
-#         test_page = f.read()
-#
-#     # assert expected_page == test_page
+def test_download():
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        with open('./tests/fixtures/expected_page.html', 'r') as file:
+            expected_page = re.sub(r'test', tmpdirname, file.read())
+            path_to_test_page = download(URL, tmpdirname)
+            with open(path_to_test_page, 'r') as test_page:
+                assert expected_page == test_page.read()
