@@ -3,6 +3,7 @@ import re
 import tempfile
 from page_loader.page_loader import make_name, is_valid, download_resource
 from page_loader.page_loader import download
+import requests
 
 
 URL = 'https://page-loader.hexlet.repl.co'
@@ -36,13 +37,12 @@ def test_is_valid(url: str, link: str, expected_result: bool):
     assert is_valid(url, link) == expected_result
 
 
-def test_download_resource():
-    with open('./tests/fixtures/expected_image.png', 'rb') as expected_img:
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            path_to_test_img = download_resource(IMG, tmpdirname)
-            with open(path_to_test_img, 'rb') as test_img:
-                assert bytearray(test_img.read()) == \
-                       bytearray(expected_img.read())
+def test_download_resource(requests_mock):
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        expected_path = tmpdirname + '/page-loader-hexlet-repl-co.html'
+        requests_mock.get(URL, text='data')
+        test_path = download_resource(URL, tmpdirname)
+        assert expected_path == test_path
 
 
 def test_download():
