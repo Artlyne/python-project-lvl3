@@ -1,30 +1,38 @@
+import os
 import pytest
 import re
 import tempfile
 from page_loader.page_loader import make_name, is_valid, download_resource
 from page_loader.page_loader import download
-import requests
 
 
-URL = 'https://page-loader.hexlet.repl.co'
-IMG = 'https://page-loader.hexlet.repl.co/assets/professions/nodejs.png'
+URL = 'https://artlyne.github.io/python-project-lvl3'
+IMG = 'https://artlyne.github.io/assets/nodejs.png'
+NAME_PREFIX = 'artlyne-github-io-python-project-lvl3'
 
 
 test_names_cases = [
-    (URL, 'page-loader-hexlet-repl-co.html'),
-    (f'{URL}/python', 'page-loader-hexlet-repl-co-python.html'),
-    (f'{URL}/python.html', 'page-loader-hexlet-repl-co-python.html'),
-    (f'{URL}/python.png', 'page-loader-hexlet-repl-co-python.png'),
-    (f'{URL}/python.jpg', 'page-loader-hexlet-repl-co-python.jpg'),
-    (f'{URL}/python_-_1.jpg', 'page-loader-hexlet-repl-co-python-1.jpg'),
+    (URL, f'{NAME_PREFIX}.html'),
+    (f'{URL}/python', f'{NAME_PREFIX}-python.html'),
+    (f'{URL}/python.html', f'{NAME_PREFIX}-python.html'),
+    (f'{URL}/python.png', f'{NAME_PREFIX}-python.png'),
+    (f'{URL}/python.jpg', f'{NAME_PREFIX}-python.jpg'),
+    (f'{URL}/python_-_1.jpg', f'{NAME_PREFIX}-python-1.jpg'),
 ]
 
 
 test_valid_cases = [
-    (URL, 'https://page-loader.hexlet.repl.co/courses', True),
-    (URL, 'https://hexlet.repl.co/courses', False),
+    (URL, f'{URL}/courses', True),
+    (URL, 'https://hexlet.github.io/courses', False),
     (URL, None, False),
 ]
+
+
+paths = [f'/{NAME_PREFIX}_files/',
+         f'/{NAME_PREFIX}_files/artlyne-github-io-assets-application.css',
+         f'/{NAME_PREFIX}_files/artlyne-github-io-courses.html',
+         f'/{NAME_PREFIX}_files/artlyne-github-io-assets-nodejs.png',
+         f'/{NAME_PREFIX}_files/artlyne-github-io-script.js']
 
 
 @pytest.mark.parametrize('tested_name, expected_name', test_names_cases)
@@ -37,12 +45,15 @@ def test_is_valid(url: str, link: str, expected_result: bool):
     assert is_valid(url, link) == expected_result
 
 
-def test_download_resource(requests_mock):
+def test_download_resource():
     with tempfile.TemporaryDirectory() as tmpdirname:
-        expected_path = tmpdirname + '/page-loader-hexlet-repl-co.html'
-        requests_mock.get(URL, text='data')
-        test_path = download_resource(URL, tmpdirname)
-        assert expected_path == test_path
+        with open('./tests/fixtures/expected_image.png', 'rb') as expected_img:
+            expected_path = tmpdirname + '/artlyne-github-io-assets-nodejs.png'
+            test_path = download_resource(IMG, tmpdirname)
+            assert expected_path == test_path
+            with open(test_path, 'rb') as test_img:
+                assert bytearray(expected_img.read()) == \
+                       bytearray(test_img.read())
 
 
 def test_download():
@@ -50,5 +61,7 @@ def test_download():
         with open('./tests/fixtures/expected_page.html', 'r') as file:
             expected_page = re.sub(r'test', tmpdirname, file.read())
             path_to_test_page = download(URL, tmpdirname)
+            for path in paths:
+                assert os.path.exists(tmpdirname + path)
             with open(path_to_test_page, 'r') as test_page:
                 assert expected_page == test_page.read()
