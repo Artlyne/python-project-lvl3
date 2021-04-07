@@ -5,7 +5,7 @@ import requests
 from page_loader import resources, naming
 
 
-def download(url: str, path: str) -> str:
+def download(url: str, path='') -> str:
     logging.basicConfig(filename='app.log', filemode='w', level=logging.INFO,
                         format='%(asctime)s - %(name)s - %(levelname)s - '
                                '%(message)s - %(filename)s - '
