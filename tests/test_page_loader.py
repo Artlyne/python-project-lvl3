@@ -2,12 +2,11 @@ import os
 import pytest
 import re
 import tempfile
-from page_loader.page_loader import make_name, is_valid, download_resource
-from page_loader.page_loader import download
+from page_loader import naming, page_loader, resources
 
 
 URL = 'https://artlyne.github.io/python-project-lvl3'
-IMG = 'https://artlyne.github.io/assets/nodejs.png'
+IMG = 'https://artlyne.github.io/python-project-lvl3/assets/nodejs.png'
 NAME_PREFIX = 'artlyne-github-io-python-project-lvl3'
 
 
@@ -29,27 +28,27 @@ test_valid_cases = [
 
 
 paths = [f'/{NAME_PREFIX}_files/',
-         f'/{NAME_PREFIX}_files/artlyne-github-io-assets-application.css',
+         f'/{NAME_PREFIX}_files/{NAME_PREFIX}-assets-application.css',
          f'/{NAME_PREFIX}_files/artlyne-github-io-courses.html',
-         f'/{NAME_PREFIX}_files/artlyne-github-io-assets-nodejs.png',
+         f'/{NAME_PREFIX}_files/{NAME_PREFIX}-assets-nodejs.png',
          f'/{NAME_PREFIX}_files/artlyne-github-io-script.js']
 
 
 @pytest.mark.parametrize('tested_name, expected_name', test_names_cases)
 def test_make_name(tested_name: str, expected_name: str):
-    assert make_name(tested_name) == expected_name
+    assert naming.create(tested_name) == expected_name
 
 
 @pytest.mark.parametrize('url, link, expected_result', test_valid_cases)
 def test_is_valid(url: str, link: str, expected_result: bool):
-    assert is_valid(url, link) == expected_result
+    assert resources.is_valid(url, link) == expected_result
 
 
 def test_download_resource():
     with tempfile.TemporaryDirectory() as tmpdirname:
         with open('./tests/fixtures/expected_image.png', 'rb') as expected_img:
-            expected_path = tmpdirname + '/artlyne-github-io-assets-nodejs.png'
-            test_path = download_resource(IMG, tmpdirname)
+            expected_path = tmpdirname + f'/{NAME_PREFIX}-assets-nodejs.png'
+            test_path = resources.download(IMG, tmpdirname)
             assert expected_path == test_path
             with open(test_path, 'rb') as test_img:
                 assert bytearray(expected_img.read()) == \
@@ -60,7 +59,7 @@ def test_download():
     with tempfile.TemporaryDirectory() as tmpdirname:
         with open('./tests/fixtures/expected_page.html', 'r') as file:
             expected_page = re.sub(r'test', tmpdirname, file.read())
-            path_to_test_page = download(URL, tmpdirname)
+            path_to_test_page = page_loader.download(URL, tmpdirname)
             for path in paths:
                 assert os.path.exists(tmpdirname + path)
             with open(path_to_test_page, 'r') as test_page:
