@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from page_loader import page_loader
+from page_loader import page_loader, cli
 
 
 def main():
-    args = page_loader.get_args().parse_args()
+    args = cli.get_args().parse_args()
     result = page_loader.download(args.url, args.output)
     print(result)
 
