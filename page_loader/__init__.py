@@ -1,1 +1,1 @@
-from page_loader import download
+from page_loader import page_loader
