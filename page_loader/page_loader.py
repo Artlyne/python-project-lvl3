@@ -1,5 +1,4 @@
 import os
-import sys
 import requests
 from page_loader import app_logger, resources, naming
 
