@@ -51,7 +51,7 @@ def replace_to_local(url: str, htmlpage: str, assets_path: str):
             logger.info(f'downloading {link}')
             Bar(f'Loading {link}\n')
             filepath = download(link, assets_path)
-            logger.info(f'replacing resource path in page to local')
+            logger.info('replacing resource path in page to local')
             resource[resource_source] = filepath
 
     logger.info('Function done! Returning the html page.')
