@@ -16,7 +16,7 @@ test_names_cases = [
     (f'{URL}/python.html', f'{NAME_PREFIX}-python.html'),
     (f'{URL}/python.png', f'{NAME_PREFIX}-python.png'),
     (f'{URL}/python.jpg', f'{NAME_PREFIX}-python.jpg'),
-    (f'{URL}/python_-_1.jpg', f'{NAME_PREFIX}-python-1.jpg'),
+    (f'{URL}/python%1.jpg', f'{NAME_PREFIX}-python-1.jpg'),
 ]
 
 

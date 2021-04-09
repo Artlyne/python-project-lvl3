@@ -33,7 +33,8 @@ def download(url: str, path='') -> str:
     logger.info(f'creating path for {filename}')
     htmlpage_path = os.path.join(path, filename)
     logger.info('creating path for assets')
-    assets_path = htmlpage_path.rstrip('.html') + '_files'
+    htmlfile_extension = -5
+    assets_path = htmlpage_path[:htmlfile_extension] + '_files'
 
     try:
         logger.info(f'creating directory {assets_path} for assets')
