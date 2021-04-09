@@ -10,6 +10,11 @@ class AppInternalError(Exception):
 
 
 def download(url: str, path='') -> str:
+
+    if not os.path.exists(path):
+        logger.error(f"Directory {path} doesn't exists.")
+        raise AppInternalError(f"Directory {path} doesn't exists.")
+
     try:
         logger.info(f'getting response from {url}')
         response = requests.get(url)
@@ -31,7 +36,7 @@ def download(url: str, path='') -> str:
     assets_path = htmlpage_path.rstrip('.html') + '_files'
 
     try:
-        logger.info(f'creating directory {assets_path}')
+        logger.info(f'creating directory {assets_path} for assets')
         os.makedirs(assets_path, exist_ok=True)
     except OSError as e:
         logger.error(e)
