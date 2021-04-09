@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import requests
 import sys
 from page_loader import app_logger, page_loader, cli
 
@@ -11,11 +10,8 @@ def main():
     try:
         result = page_loader.download(args.url, args.output)
         print(result)
-    except requests.exceptions.RequestException as e:
-        logger.error(e)
-        sys.exit(1)
-    except OSError as e:
-        logger.error(e)
+    except page_loader.AppInternalError as e:
+        print(e)
         sys.exit(1)
 
 

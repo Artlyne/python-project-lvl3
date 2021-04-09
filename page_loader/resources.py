@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from progress.bar import Bar
 from urllib.parse import urlparse, urljoin
-from page_loader import app_logger, naming
+from page_loader import app_logger, naming, page_loader
 
 
 TAGS = {'img': 'src', 'script': 'src', 'link': 'href'}
@@ -21,17 +21,27 @@ def is_valid(url: str, link: str) -> bool:
 
 
 def download(url: str, path: str) -> str:
-    logger.info(f'getting response from {url}')
-    response = requests.get(url)
+    try:
+        logger.info(f'getting response from {url}')
+        response = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        logger.error(e)
+        raise page_loader.AppInternalError(
+            'Network error! See log for more details.') from e
 
     logger.info(f'creating name for {url}')
     filename = naming.create(url)
     logger.info(f'creating path for {filename}')
     filepath = os.path.join(path, filename)
 
-    logger.info(f'writing file content to {filepath}')
-    with open(filepath, 'wb') as file:
-        file.write(response.content)
+    try:
+        logger.info(f'writing file content to {filepath}')
+        with open(filepath, 'wb') as file:
+            file.write(response.content)
+    except OSError as e:
+        logger.error(e)
+        raise page_loader.AppInternalError(
+            'System error! See log for more details.') from e
 
     logger.info('Function done! Returning the path to the file.')
     return filepath
