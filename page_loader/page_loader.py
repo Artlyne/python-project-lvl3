@@ -13,6 +13,11 @@ def download(url: str, path='') -> str:
     try:
         logger.info(f'getting response from {url}')
         response = requests.get(url)
+
+        if not response.ok:
+            logger.error(f'Error code {response.status_code}')
+            raise AppInternalError(f'Error code {response.status_code}')
+
     except requests.exceptions.RequestException as e:
         logger.error(e)
         raise AppInternalError(
