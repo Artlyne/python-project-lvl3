@@ -10,14 +10,15 @@ class AppInternalError(Exception):
 
 
 def download(url: str, path='') -> str:
+    logger.info(f'trying to download {url} to {path}')
 
     if not os.path.exists(path):
         logger.error(f"Directory {path} doesn't exists.")
         raise AppInternalError(f"Directory {path} doesn't exists.")
 
     try:
-        logger.info(f'getting response from {url}')
         response = requests.get(url)
+        logger.info(f'received a response from {url}')
 
         if not response.ok:
             logger.error(f'Error code {response.status_code}')
@@ -28,29 +29,29 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'Network error! See log for more details.') from e
 
-    logger.info(f'creating name for {url}')
     filename = naming.create(url)
-    logger.info(f'creating path for {filename}')
+    logger.info(f'created name {filename}')
     htmlpage_path = os.path.join(path, filename)
-    logger.info('creating path for assets')
+    logger.info(f'created path {htmlpage_path} to the page')
     htmlfile_extension = -5
     assets_path = htmlpage_path[:htmlfile_extension] + '_files'
+    logger.info(f'created path {assets_path} for assets')
 
     try:
-        logger.info(f'creating directory {assets_path} for assets')
         os.makedirs(assets_path, exist_ok=True)
+        logger.info(f'created directory {assets_path} for assets')
     except OSError as e:
         logger.error(e)
         raise AppInternalError(
             'System error! See log for more details.') from e
 
-    logger.info('replacing page content to local')
     page_content = resources.replace_to_local(url, response.text, assets_path)
+    logger.info('replaced page content to local')
 
     try:
-        logger.info(f'writing page content to {htmlpage_path}')
         with open(htmlpage_path, 'w', encoding='utf-8') as file:
             file.write(page_content)
+            logger.info(f'page content written to {htmlpage_path}')
     except OSError as e:
         logger.error(e)
         raise AppInternalError(

@@ -21,18 +21,20 @@ def is_valid(url: str, link: str) -> bool:
 
 
 def download(url: str, path: str) -> str:
+    logger.info(f'trying to download {url} to {path}')
+
     try:
-        logger.info(f'getting response from {url}')
         response = requests.get(url)
+        logger.info(f'received a response from {url}')
     except requests.exceptions.RequestException as e:
         logger.error(e)
         raise page_loader.AppInternalError(
             'Network error! See log for more details.') from e
 
-    logger.info(f'creating name for {url}')
     filename = naming.create(url)
-    logger.info(f'creating path for {filename}')
+    logger.info(f'creating name for {url}')
     filepath = os.path.join(path, filename)
+    logger.info(f'created path {filepath} to the page')
 
     try:
         logger.info(f'writing file content to {filepath}')
@@ -48,21 +50,20 @@ def download(url: str, path: str) -> str:
 
 
 def replace_to_local(url: str, htmlpage: str, assets_path: str):
-    logger.info('making the soup')
     soup = BeautifulSoup(htmlpage, 'html.parser')
+    logger.info('the soup was made')
 
     logger.info('looking for links')
     for resource in soup.findAll(TAGS):
         resource_source = TAGS[resource.name]
         link = urljoin(url, resource.get(resource_source))
 
-        logger.info('checking if resource is local')
         if is_valid(url, link):
-            logger.info(f'downloading {link}')
             Bar(f'Loading {link}\n')
             filepath = download(link, assets_path)
-            logger.info('replacing resource path in page to local')
+            logger.info(f'downloaded {link}')
             resource[resource_source] = filepath
+            logger.info('replaced resource path in page to local')
 
     logger.info('Function done! Returning the html page.')
     return soup.prettify(formatter='html5')
