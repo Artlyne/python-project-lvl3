@@ -22,7 +22,7 @@ def download(url: str, path: str) -> str:
             'Network error! See log for more details.') from e
 
     filename = naming.create(url)
-    logger.info(f'created name for {url}')
+    logger.info(f'created name {filename}')
     filepath = os.path.join(path, filename)
     logger.info(f'created path {filepath} to the page')
 
@@ -35,8 +35,10 @@ def download(url: str, path: str) -> str:
         raise page_loader.AppInternalError(
             'System error! See log for more details.') from e
 
-    logger.info(f'Function done! Returning {filepath}')
-    return filepath
+    _, local_dir = os.path.split(path)
+    local_path = os.path.join(local_dir, filename)
+    logger.info(f'Function done! Returning {local_path}')
+    return local_path
 
 
 def is_local(url: str, asset_link: str) -> bool:
@@ -55,14 +57,13 @@ def replace_to_local(url: str, htmlpage: str, assets_path: str):
     for asset in soup.findAll(TAGS):
         tag = TAGS[asset.name]
         asset_link = asset.get(tag)
-
         if is_local(url, asset_link):
             link = urljoin(url, asset_link)
             Bar(f'Loading {link}\n')
-            local_link = download(link, assets_path)
+            local_path = download(link, assets_path)
             logger.info(f'downloaded {link}')
-            asset[tag] = local_link
-            logger.info(f'asset {link} on the page replaced with {local_link}')
+            asset[tag] = local_path
+            logger.info(f'asset {link} on the page replaced with {local_path}')
 
     logger.info('Function done! Returning the html page.')
     return soup.prettify(formatter='html5')

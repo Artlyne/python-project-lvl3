@@ -48,20 +48,20 @@ def test_is_local(url: str, link: str, expected_result: bool):
 def test_download_resource():
     with tempfile.TemporaryDirectory() as tmpdirname:
         with open('./tests/fixtures/expected_image.png', 'rb') as expected_img:
-            expected_path = tmpdirname + f'/{NAME_PREFIX}-assets-nodejs.png'
+            head, tail = os.path.split(tmpdirname)
+            expected_path = tail + f'/{NAME_PREFIX}-assets-nodejs.png'
             test_path = resources.download(IMG, tmpdirname)
             assert expected_path == test_path
-            with open(test_path, 'rb') as test_img:
+            with open(os.path.join(head, test_path), 'rb') as test_img:
                 assert bytearray(expected_img.read()) == \
                        bytearray(test_img.read())
 
 
 def test_download():
     with tempfile.TemporaryDirectory() as tmpdirname:
-        with open('./tests/fixtures/expected_page.html', 'r') as file:
-            expected_page = re.sub(r'test', tmpdirname, file.read())
+        with open('./tests/fixtures/expected_page.html', 'r') as expected_page:
             path_to_test_page = page_loader.download(URL, tmpdirname)
             for path in paths:
                 assert os.path.exists(tmpdirname + path)
             with open(path_to_test_page, 'r') as test_page:
-                assert expected_page == test_page.read()
+                assert expected_page.read() == test_page.read()
