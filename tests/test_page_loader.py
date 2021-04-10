@@ -1,6 +1,5 @@
 import os
 import pytest
-import re
 import tempfile
 from page_loader import naming, page_loader, resources
 
