@@ -6,8 +6,8 @@ logger = app_logger.get_logger(__name__)
 
 
 def main():
-    args = cli.get_args().parse_args()
     try:
+        args = cli.get_args().parse_args()
         result = page_loader.download(args.url, args.output)
         print(result)
     except page_loader.AppInternalError as e:
