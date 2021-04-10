@@ -13,6 +13,8 @@ def main():
     except page_loader.AppInternalError as e:
         print(e)
         sys.exit(1)
+    else:
+        sys.exit(0)
 
 
 if __name__ == '__main__':
