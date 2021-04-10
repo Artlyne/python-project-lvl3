@@ -20,10 +20,11 @@ test_names_cases = [
 ]
 
 
-test_valid_cases = [
+test_local_cases = [
     (URL, f'{URL}/courses', True),
     (URL, 'https://hexlet.github.io/courses', False),
-    (URL, None, False),
+    (URL, '/assets/image.png', True),
+    (URL, 'https://github.io/python-project-lvl3/image.png', False),
 ]
 
 
@@ -39,9 +40,9 @@ def test_make_name(tested_name: str, expected_name: str):
     assert naming.create(tested_name) == expected_name
 
 
-@pytest.mark.parametrize('url, link, expected_result', test_valid_cases)
-def test_is_valid(url: str, link: str, expected_result: bool):
-    assert resources.is_valid(url, link) == expected_result
+@pytest.mark.parametrize('url, link, expected_result', test_local_cases)
+def test_is_local(url: str, link: str, expected_result: bool):
+    assert resources.is_local(url, link) == expected_result
 
 
 def test_download_resource():
