@@ -20,7 +20,7 @@ def download(url: str, path='') -> str:
         response = requests.get(url)
         logger.info(f'received a response from {url}')
 
-        if not response.ok:
+        if response.raise_for_status():
             logger.error(f'Error code {response.status_code}')
             raise AppInternalError(f'Error code {response.status_code}')
 
