@@ -1,5 +1,6 @@
 import os
 import tempfile
+import pytest
 from page_loader import page_loader
 
 
@@ -30,3 +31,16 @@ def test_download():
                 with open(tmp_path_to_test_asset, 'rb') as test_asset:
                     with open(expected_asset_path, 'rb') as expected_asset:
                         assert test_asset.read() == expected_asset.read()
+
+
+def test_network_errors(requests_mock):
+    for code in (400, 404, 500, 502):
+        requests_mock.get('https://test.com', text='data', status_code=code)
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            with pytest.raises(page_loader.AppInternalError):
+                page_loader.download('https://test.com', tmpdirname)
+
+
+def test_os_errors():
+    with pytest.raises(page_loader.AppInternalError):
+        page_loader.download('https://test.com', 'not_exists')
