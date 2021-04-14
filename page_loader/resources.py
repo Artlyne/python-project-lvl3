@@ -28,7 +28,8 @@ def download(url: str, path: str) -> str:
 
     try:
         with open(filepath, 'wb') as file:
-            file.write(response.content)
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
             logger.info(f'file content written to {filepath}')
     except OSError as e:
         logger.error(e)
