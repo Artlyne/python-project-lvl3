@@ -21,7 +21,7 @@ def download(url: str, path: str) -> str:
         raise page_loader.AppInternalError(
             'Network error! See log for more details.') from e
 
-    filename = naming.create(url)
+    filename = naming.create_name(url)
     logger.info(f'created name {filename}')
     filepath = os.path.join(path, filename)
     logger.info(f'created path {filepath} to the page')

@@ -29,12 +29,14 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'Network error! See log for more details.') from e
 
-    filename = naming.create(url)
+    filename = naming.create_name(url)
     logger.info(f'created name {filename}')
     htmlpage_path = os.path.join(path, filename)
     logger.info(f'created path {htmlpage_path} to the page')
-    htmlfile_extension = -5
-    assets_path = htmlpage_path[:htmlfile_extension] + '_files'
+
+    assets_dir_name = naming.create_assets_path_name(url)
+    logger.info(f'created assets dir name {assets_dir_name}')
+    assets_path = os.path.join(path, assets_dir_name)
     logger.info(f'created path {assets_path} for assets')
 
     try:
