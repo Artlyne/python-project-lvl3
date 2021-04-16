@@ -47,12 +47,13 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'System error! See log for more details.') from e
 
-    page_content = resources.replace_to_local(url, response.text, assets_path)
+    assets = resources.prepare_assets(url, response.text, assets_path)
+    htmlpage = resources.replace_links(response.text, assets)
     logger.info('all page content replaced to local')
 
     try:
         with open(htmlpage_path, 'w', encoding='utf-8') as file:
-            file.write(page_content)
+            file.write(htmlpage)
             logger.info(f'page content written to {htmlpage_path}')
     except OSError as e:
         logger.error(e)

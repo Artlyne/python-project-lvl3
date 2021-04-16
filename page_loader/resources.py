@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 from bs4 import BeautifulSoup
 from progress.bar import Bar
@@ -6,11 +7,11 @@ from urllib.parse import urlparse, urljoin
 from page_loader import app_logger, naming, page_loader
 
 
-TAGS = {'img': 'src', 'script': 'src', 'link': 'href'}
+ATTRIBUTES = {'img': 'src', 'script': 'src', 'link': 'href'}
 logger = app_logger.get_logger(__name__)
 
 
-def download(url: str, path: str) -> str:
+def download_asset(url: str, path: str) -> str:
     logger.info(f'trying to download {url} to {path}')
 
     try:
@@ -37,9 +38,9 @@ def download(url: str, path: str) -> str:
             'System error! See log for more details.') from e
 
     _, local_dir = os.path.split(path)
-    local_path = os.path.join(local_dir, filename)
-    logger.info(f'Function done! Returning {local_path}')
-    return local_path
+    downloaded_asset_path = os.path.join(local_dir, filename)
+    logger.info(f'Function done! Returning {downloaded_asset_path}')
+    return downloaded_asset_path
 
 
 def is_local(url: str, asset_link: str) -> bool:
@@ -50,21 +51,23 @@ def is_local(url: str, asset_link: str) -> bool:
     return base_domain == asset_domain
 
 
-def replace_to_local(url: str, htmlpage: str, assets_path: str):
+def prepare_assets(url: str, htmlpage: str, assets_path: str) -> dict:
+    assets = {}
     soup = BeautifulSoup(htmlpage, 'html.parser')
-    logger.info('the soup was made')
-
-    logger.info('looking for links')
-    for asset in soup.findAll(TAGS):
-        tag = TAGS[asset.name]
-        asset_link = asset.get(tag)
+    for element in soup.findAll(ATTRIBUTES):
+        attribute_name = ATTRIBUTES[element.name]
+        asset_link = element.get(attribute_name)
         if is_local(url, asset_link):
             link = urljoin(url, asset_link)
             Bar(f'Loading {link}\n')
-            local_path = download(link, assets_path)
-            logger.info(f'downloaded {link}')
-            asset[tag] = local_path
-            logger.info(f'asset {link} on the page replaced with {local_path}')
+            downloaded_asset_path = download_asset(link, assets_path)
+            assets[asset_link] = downloaded_asset_path
+    return assets
+
+
+def replace_links(htmlpage: str, assets: dict) -> str:
+    for local_asset_path, downloaded_asset_path in assets.items():
+        htmlpage = re.sub(local_asset_path, downloaded_asset_path, htmlpage)
 
     logger.info('Function done! Returning the html page.')
-    return soup.prettify(formatter='html5')
+    return htmlpage

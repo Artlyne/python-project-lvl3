@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hexlet-code"
-version = "0.19.0"
+version = "0.20.0"
 description = "the command line utility, which downloads a page from the network and puts it in the specified existing directory"
 authors = ["Andrey Martsenius <artlynee@gmail.com>"]
 
