@@ -1,8 +1,6 @@
 import os
-import re
 import requests
 from bs4 import BeautifulSoup
-from progress.bar import Bar
 from urllib.parse import urlparse, urljoin
 from page_loader import app_logger, naming, page_loader
 
@@ -11,36 +9,31 @@ ATTRIBUTES = {'img': 'src', 'script': 'src', 'link': 'href'}
 logger = app_logger.get_logger(__name__)
 
 
-def download_asset(url: str, path: str) -> str:
-    logger.info(f'trying to download {url} to {path}')
+def download_asset(link: str, assets_path: str):
+    logger.info(f'trying to download {link} to {assets_path}')
 
     try:
-        response = requests.get(url)
-        logger.info(f'received a response from {url}')
+        response = requests.get(link)
+        logger.info(f'received a response from {link}')
     except requests.exceptions.RequestException as e:
         logger.error(e)
         raise page_loader.AppInternalError(
             'Network error! See log for more details.') from e
 
-    filename = naming.create_name(url)
-    logger.info(f'created name {filename}')
-    filepath = os.path.join(path, filename)
-    logger.info(f'created path {filepath} to the page')
+    file_name = naming.create_name(link)
+    logger.info(f'created name {file_name}')
+    file_path = os.path.join(assets_path, file_name)
+    logger.info(f'created path {file_path} to the page')
 
     try:
-        with open(filepath, 'wb') as file:
+        with open(file_path, 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
-            logger.info(f'file content written to {filepath}')
+            logger.info(f'file content written to {file_path}')
     except OSError as e:
         logger.error(e)
         raise page_loader.AppInternalError(
             'System error! See log for more details.') from e
-
-    _, local_dir = os.path.split(path)
-    downloaded_asset_path = os.path.join(local_dir, filename)
-    logger.info(f'Function done! Returning {downloaded_asset_path}')
-    return downloaded_asset_path
 
 
 def is_local(url: str, asset_link: str) -> bool:
@@ -51,31 +44,25 @@ def is_local(url: str, asset_link: str) -> bool:
     return base_domain == asset_domain
 
 
-def prepare_assets(url: str, htmlpage: str, assets_path: str):
-    soup = BeautifulSoup(htmlpage, 'html.parser')
-    assets = {}
+def replace_links(url: str, page: str, assets_dir_name: str):
+    soup = BeautifulSoup(page, 'html.parser')
+    assets_links = []
 
     logger.info('looking for links')
     for element in soup.findAll(ATTRIBUTES):
         attribute_name = ATTRIBUTES[element.name]
         asset_link = element.get(attribute_name)
-        logger.info(f'asset link {asset_link}')
+        logger.info(f'received asset link {asset_link}')
 
         if is_local(url, asset_link):
+            logger.info(f'{asset_link} is local')
             link = urljoin(url, asset_link)
-            Bar(f'Loading {link}\n')
-            downloaded_asset_path = download_asset(link, assets_path)
-            logger.info(f'the {link} was downloaded in the '
-                        f'{downloaded_asset_path}')
-            assets[asset_link] = downloaded_asset_path
-            logger.info(f'the {link} added to assets')
+            asset_name = naming.create_name(link)
+            asset_path = os.path.join(assets_dir_name, asset_name)
+            element[attribute_name] = asset_path
+            logger.info(f'{asset_link} replaced with {asset_path}')
+            assets_links.append(link)
+            logger.info(f'{link} added to assets_links')
 
     logger.info('Function done! Returning assets and page.')
-    return assets, soup.prettify(formatter='html5')
-
-
-def replace_links(htmlpage: str, assets: dict) -> str:
-    for local_asset_path, downloaded_asset_path in assets.items():
-        htmlpage = re.sub(local_asset_path, downloaded_asset_path, htmlpage)
-    logger.info('Function done! Returning the html page.')
-    return htmlpage
+    return soup.prettify(formatter='html5'), assets_links

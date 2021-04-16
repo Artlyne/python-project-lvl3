@@ -19,11 +19,9 @@ def test_is_local(url: str, link: str, expected_result: bool):
 def test_download_asset():
     with tempfile.TemporaryDirectory() as tmpdirname:
         with open('./tests/fixtures/expected_image.png', 'rb') as expected_img:
-            head, tail = os.path.split(tmpdirname)
-            expected_path = tail + '/artlyne-github-io-python-project-lvl3-' \
-                                   'assets-nodejs.png'
-            test_path = resources.download_asset(IMG, tmpdirname)
-            assert expected_path == test_path
-            with open(os.path.join(head, test_path), 'rb') as test_img:
+            resources.download_asset(IMG, tmpdirname)
+            path_to_test_img = tmpdirname + '/artlyne-github-io-python-' \
+                                            'project-lvl3-assets-nodejs.png'
+            with open(path_to_test_img, 'rb') as test_img:
                 assert bytearray(expected_img.read()) == \
                        bytearray(test_img.read())

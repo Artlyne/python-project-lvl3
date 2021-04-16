@@ -1,5 +1,6 @@
 import os
 import requests
+from progress.bar import Bar
 from page_loader import app_logger, resources, naming
 
 logger = app_logger.get_logger(__name__)
@@ -47,18 +48,22 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'System error! See log for more details.') from e
 
-    assets, page = resources.prepare_assets(url, response.text, assets_path)
-    htmlpage = resources.replace_links(page, assets)
-    logger.info('all page content replaced to local')
+    page, assets_links = resources.replace_links(url, response.text,
+                                                 assets_dir_name)
+    logger.info('all links replaced')
 
     try:
         with open(page_path, 'w', encoding='utf-8') as file:
-            file.write(htmlpage)
+            file.write(page)
             logger.info(f'page content written to {page_path}')
     except OSError as e:
         logger.error(e)
         raise AppInternalError(
             'System error! See log for more details.') from e
+
+    for link in assets_links:
+        Bar(f'Loading {link}\n')
+        resources.download_asset(link, assets_path)
 
     logger.info(f'Function done! Returning {page_path}')
     return page_path
