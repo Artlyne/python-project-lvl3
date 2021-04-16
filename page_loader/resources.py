@@ -51,7 +51,7 @@ def is_local(url: str, asset_link: str) -> bool:
     return base_domain == asset_domain
 
 
-def prepare_assets(url: str, htmlpage: str, assets_path: str) -> dict:
+def prepare_assets(url: str, htmlpage: str, assets_path: str):
     assets = {}
     soup = BeautifulSoup(htmlpage, 'html.parser')
     for element in soup.findAll(ATTRIBUTES):
@@ -62,7 +62,7 @@ def prepare_assets(url: str, htmlpage: str, assets_path: str) -> dict:
             Bar(f'Loading {link}\n')
             downloaded_asset_path = download_asset(link, assets_path)
             assets[asset_link] = downloaded_asset_path
-    return assets
+    return assets, soup.prettify(formatter='html5')
 
 
 def replace_links(htmlpage: str, assets: dict) -> str:

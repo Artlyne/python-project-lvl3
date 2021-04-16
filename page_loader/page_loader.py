@@ -47,8 +47,8 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'System error! See log for more details.') from e
 
-    assets = resources.prepare_assets(url, response.text, assets_path)
-    htmlpage = resources.replace_links(response.text, assets)
+    assets, page = resources.prepare_assets(url, response.text, assets_path)
+    htmlpage = resources.replace_links(page, assets)
     logger.info('all page content replaced to local')
 
     try:
