@@ -1,4 +1,3 @@
-import os
 import pytest
 import tempfile
 from page_loader import resources
