@@ -17,4 +17,11 @@ pip install git+https://github.com/artlyne/python-project-lvl3
 ```
 page-loader --output ./<DIR_NAME> <URL>
 ```
+directory must exist
+***
+## Example
+```
+page-loader --output ./app https://page-loader.hexlet.repl.co/
+```
+
 [![asciicast](https://asciinema.org/a/Clxo8EdVFzfLbVBKywQKMuWjf.svg)](https://asciinema.org/a/Clxo8EdVFzfLbVBKywQKMuWjf)
