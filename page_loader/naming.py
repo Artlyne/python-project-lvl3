@@ -14,7 +14,7 @@ def create_name(url: str) -> str:
     return name[:MAX_LENGTH] + file_extension
 
 
-def create_assets_path_name(url: str) -> str:
+def create_assets_dir_name(url: str) -> str:
     parsed_url = urlparse(url)
     root, _ = os.path.splitext(parsed_url.path)
     name = re.sub(r'[^a-zA-Z0-9]', '-', parsed_url.netloc + root)

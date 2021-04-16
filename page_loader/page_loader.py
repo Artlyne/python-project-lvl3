@@ -29,12 +29,12 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'Network error! See log for more details.') from e
 
-    filename = naming.create_name(url)
-    logger.info(f'created name {filename}')
-    htmlpage_path = os.path.join(path, filename)
-    logger.info(f'created path {htmlpage_path} to the page')
+    page_name = naming.create_name(url)
+    logger.info(f'created name {page_name}')
+    page_path = os.path.join(path, page_name)
+    logger.info(f'created path {page_path} to the page')
 
-    assets_dir_name = naming.create_assets_path_name(url)
+    assets_dir_name = naming.create_assets_dir_name(url)
     logger.info(f'created assets dir name {assets_dir_name}')
     assets_path = os.path.join(path, assets_dir_name)
     logger.info(f'created path {assets_path} for assets')
@@ -52,13 +52,13 @@ def download(url: str, path='') -> str:
     logger.info('all page content replaced to local')
 
     try:
-        with open(htmlpage_path, 'w', encoding='utf-8') as file:
+        with open(page_path, 'w', encoding='utf-8') as file:
             file.write(htmlpage)
-            logger.info(f'page content written to {htmlpage_path}')
+            logger.info(f'page content written to {page_path}')
     except OSError as e:
         logger.error(e)
         raise AppInternalError(
             'System error! See log for more details.') from e
 
-    logger.info(f'Function done! Returning {htmlpage_path}')
-    return htmlpage_path
+    logger.info(f'Function done! Returning {page_path}')
+    return page_path

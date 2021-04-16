@@ -22,4 +22,4 @@ def test_create_name(url: str, expected_name: str):
     (f'{URL}/python', f'{NAME_PREFIX}-python_files'),
     (f'{URL}/python.html', f'{NAME_PREFIX}-python_files')])
 def test_create_assets_path(url: str, expected_name_path: str):
-    assert naming.create_assets_path_name(url) == expected_name_path
+    assert naming.create_assets_dir_name(url) == expected_name_path
