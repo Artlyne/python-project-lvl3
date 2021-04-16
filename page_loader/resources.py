@@ -52,22 +52,30 @@ def is_local(url: str, asset_link: str) -> bool:
 
 
 def prepare_assets(url: str, htmlpage: str, assets_path: str):
-    assets = {}
     soup = BeautifulSoup(htmlpage, 'html.parser')
+    assets = {}
+
+    logger.info('looking for links')
     for element in soup.findAll(ATTRIBUTES):
         attribute_name = ATTRIBUTES[element.name]
         asset_link = element.get(attribute_name)
+        logger.info(f'asset link {asset_link}')
+
         if is_local(url, asset_link):
             link = urljoin(url, asset_link)
             Bar(f'Loading {link}\n')
             downloaded_asset_path = download_asset(link, assets_path)
+            logger.info(f'the {link} was downloaded in the '
+                        f'{downloaded_asset_path}')
             assets[asset_link] = downloaded_asset_path
+            logger.info(f'the {link} added to assets')
+
+    logger.info('Function done! Returning assets and page.')
     return assets, soup.prettify(formatter='html5')
 
 
 def replace_links(htmlpage: str, assets: dict) -> str:
     for local_asset_path, downloaded_asset_path in assets.items():
         htmlpage = re.sub(local_asset_path, downloaded_asset_path, htmlpage)
-
     logger.info('Function done! Returning the html page.')
     return htmlpage
