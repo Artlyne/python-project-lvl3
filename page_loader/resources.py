@@ -13,7 +13,7 @@ def download_asset(link: str, assets_path: str):
     logger.info(f'trying to download {link} to {assets_path}')
 
     try:
-        response = requests.get(link)
+        response = requests.get(link, stream=True)
         logger.info(f'received a response from {link}')
     except requests.exceptions.RequestException as e:
         logger.error(e)
