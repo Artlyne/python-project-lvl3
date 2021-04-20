@@ -1,6 +1,6 @@
 import os
 import requests
-from progress.bar import Bar
+from progress.bar import ChargingBar
 from page_loader import app_logger, resources, naming
 
 logger = app_logger.get_logger(__name__)
@@ -61,9 +61,10 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'System error! See log for more details.') from e
 
-    for link in assets_links:
-        Bar(f'Loading {link}\n')
-        resources.download_asset(link, assets_path)
+    with ChargingBar('Loading', max=len(assets_links)) as bar:
+        for link in assets_links:
+            resources.download_asset(link, assets_path)
+            bar.next()
 
     logger.info(f'Function done! Returning {page_path}')
     return page_path
