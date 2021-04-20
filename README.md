@@ -24,4 +24,4 @@ directory must exist
 page-loader --output ./app https://page-loader.hexlet.repl.co/
 ```
 
-[![asciicast](https://asciinema.org/a/Clxo8EdVFzfLbVBKywQKMuWjf.svg)](https://asciinema.org/a/Clxo8EdVFzfLbVBKywQKMuWjf)
+[![asciicast](https://asciinema.org/a/F372azfThSYO5xMl1HGqjO75B.svg)](https://asciinema.org/a/F372azfThSYO5xMl1HGqjO75B)
