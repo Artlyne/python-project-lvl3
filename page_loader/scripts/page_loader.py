@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from page_loader import app_logger, page_loader, cli
-
-logger = app_logger.get_logger(__name__)
+from page_loader import page_loader, cli
 
 
 def main():

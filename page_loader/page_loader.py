@@ -1,9 +1,8 @@
 import os
 import requests
 from progress.bar import ChargingBar
-from page_loader import app_logger, resources, naming
-
-logger = app_logger.get_logger(__name__)
+from page_loader import resources, naming
+from page_loader.app_logger import logger
 
 
 class AppInternalError(Exception):

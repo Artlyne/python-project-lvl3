@@ -2,12 +2,12 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
-from page_loader import app_logger, naming
+from page_loader import naming
+from page_loader.app_logger import logger
 
 
 ATTRIBUTES = {'img': 'src', 'script': 'src', 'link': 'href'}
 ONE_MB = 2**20
-logger = app_logger.get_logger(__name__)
 
 
 def download_asset(link: str, assets_path: str):
@@ -52,14 +52,14 @@ def replace_links(url: str, page: str, assets_dir_name: str):
         logger.info(f'received asset link {asset_link}')
 
         if is_local(url, asset_link):
-            logger.info(f'{asset_link} is local')
+            logger.info(f'asset link {asset_link} is local')
             link = urljoin(url, asset_link)
             asset_name = naming.create_file_name(link)
             asset_path = os.path.join(assets_dir_name, asset_name)
             element[attribute_name] = asset_path
-            logger.info(f'{asset_link} replaced with {asset_path}')
+            logger.info(f'asset link {asset_link} replaced with {asset_path}')
             assets_links.append(link)
-            logger.info(f'{link} added to assets_links')
+            logger.info(f'link {link} added to assets_links')
 
     logger.info('Function done! Returning assets and page.')
     return soup.prettify(formatter='html5'), assets_links
