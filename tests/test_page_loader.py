@@ -16,21 +16,19 @@ PATHS = [(f'/{NAME_PREFIX}_files/{NAME_PREFIX}-assets-application.css',
           './tests/fixtures/expected_script.js')]
 
 
-def test_download():
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        with open('./tests/fixtures/expected_page.html', 'r') as expected_page:
-            path_to_test_page = page_loader.download(URL, tmpdirname)
+def test_download(tmpdir):
+    path_to_test_page = page_loader.download(URL, tmpdir)
+    test_page = open(path_to_test_page, 'r')
+    expected_page = open('./tests/fixtures/expected_page.html', 'r')
+    assert test_page.read() == expected_page.read()
 
-            with open(path_to_test_page, 'r') as test_page:
-                assert expected_page.read() == test_page.read()
+    for test_asset_path, expected_asset_path in PATHS:
+        tmp_path_to_test_asset = tmpdir.join(test_asset_path)
+        assert os.path.exists(tmp_path_to_test_asset)
 
-            for test_asset_path, expected_asset_path in PATHS:
-                tmp_path_to_test_asset = tmpdirname + test_asset_path
-                assert os.path.exists(tmp_path_to_test_asset)
-
-                with open(tmp_path_to_test_asset, 'rb') as test_asset:
-                    with open(expected_asset_path, 'rb') as expected_asset:
-                        assert test_asset.read() == expected_asset.read()
+        test_asset = open(tmp_path_to_test_asset, 'rb')
+        expected_asset = open(expected_asset_path, 'rb')
+        assert test_asset.read() == expected_asset.read()
 
 
 def test_network_errors(requests_mock):
