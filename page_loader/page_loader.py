@@ -20,10 +20,7 @@ def download(url: str, path='') -> str:
     try:
         response = requests.get(url)
         logger.info(f'received a response from {url}')
-
-        if response.raise_for_status():
-            logger.error(f'Error code {response.status_code}')
-            raise AppInternalError(f'Error code {response.status_code}')
+        response.raise_for_status()
 
     except requests.exceptions.RequestException as e:
         logger.error(e)
@@ -61,10 +58,11 @@ def download(url: str, path='') -> str:
         raise AppInternalError(
             'System error! See log for more details.') from e
 
-    with ChargingBar('Loading', max=len(assets_links)) as bar:
-        for link in assets_links:
-            resources.download_asset(link, assets_path)
-            bar.next()
+    if assets_links:
+        with ChargingBar('Loading', max=len(assets_links)) as bar:
+            for link in assets_links:
+                resources.download_asset(link, assets_path)
+                bar.next()
 
     logger.info(f'Function done! Returning {page_path}')
     return page_path
