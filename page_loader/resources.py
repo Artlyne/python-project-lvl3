@@ -2,7 +2,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
-from page_loader import app_logger, naming, page_loader
+from page_loader import app_logger, naming
 
 
 ATTRIBUTES = {'img': 'src', 'script': 'src', 'link': 'href'}
@@ -18,8 +18,6 @@ def download_asset(link: str, assets_path: str):
         logger.info(f'received a response from {link}')
     except requests.exceptions.RequestException as e:
         logger.error(e)
-        raise page_loader.AppInternalError(
-            'Network error! See log for more details.') from e
 
     file_name = naming.create_file_name(link)
     logger.info(f'created name {file_name}')
@@ -31,10 +29,8 @@ def download_asset(link: str, assets_path: str):
             for chunk in response.iter_content(chunk_size=ONE_MB):
                 file.write(chunk)
             logger.info(f'file content written to {file_path}')
-    except OSError as e:
+    except (OSError, requests.exceptions.RequestException) as e:
         logger.error(e)
-        raise page_loader.AppInternalError(
-            'System error! See log for more details.') from e
 
 
 def is_local(url: str, asset_link: str) -> bool:
