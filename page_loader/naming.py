@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 MAX_LENGTH = 100
 
 
-def normalize_name(name):
+def normalize_name(name: str) -> str:
     return re.sub('[^a-zA-Z0-9]', '-', name)
 
 
