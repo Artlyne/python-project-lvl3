@@ -6,6 +6,7 @@ from page_loader import app_logger, naming, page_loader
 
 
 ATTRIBUTES = {'img': 'src', 'script': 'src', 'link': 'href'}
+ONE_MB = 2**20
 logger = app_logger.get_logger(__name__)
 
 
@@ -20,14 +21,14 @@ def download_asset(link: str, assets_path: str):
         raise page_loader.AppInternalError(
             'Network error! See log for more details.') from e
 
-    file_name = naming.create_name(link)
+    file_name = naming.create_file_name(link)
     logger.info(f'created name {file_name}')
     file_path = os.path.join(assets_path, file_name)
     logger.info(f'created path {file_path} to the page')
 
     try:
         with open(file_path, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=8192):
+            for chunk in response.iter_content(chunk_size=ONE_MB):
                 file.write(chunk)
             logger.info(f'file content written to {file_path}')
     except OSError as e:
@@ -57,7 +58,7 @@ def replace_links(url: str, page: str, assets_dir_name: str):
         if is_local(url, asset_link):
             logger.info(f'{asset_link} is local')
             link = urljoin(url, asset_link)
-            asset_name = naming.create_name(link)
+            asset_name = naming.create_file_name(link)
             asset_path = os.path.join(assets_dir_name, asset_name)
             element[attribute_name] = asset_path
             logger.info(f'{asset_link} replaced with {asset_path}')

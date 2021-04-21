@@ -14,7 +14,7 @@ NAME_PREFIX = 'artlyne-github-io-python-project-lvl3'
     (f'{URL}/python.jpg', f'{NAME_PREFIX}-python.jpg'),
     (f'{URL}/python%1.jpg', f'{NAME_PREFIX}-python-1.jpg')])
 def test_create_name(url: str, expected_name: str):
-    assert naming.create_name(url) == expected_name
+    assert naming.create_file_name(url) == expected_name
 
 
 @pytest.mark.parametrize('url, expected_name_path', [
